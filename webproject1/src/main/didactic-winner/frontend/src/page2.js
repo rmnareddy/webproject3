@@ -1,55 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Accordion, Container, Row, Col } from 'react-bootstrap';
 import Result from './Result'; // Assuming this is the path to your Result component
+import useApodStore from  './zustStore';
 
 const Page2 = () => {
-  const formatDate = (date) => {
-    const localDate = new Date(date); // Assuming 'date' is in UTC format or any other valid format
-    const year = localDate.getFullYear();
-    const month = String(localDate.getMonth() + 1).padStart(2, '0');
-    const day = String(localDate.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-};
+  
 
-  const today = formatDate(new Date());
+  // const [date, setDate] = useState(today);
+  // const [count, setCount] = useState('');
+  // const [startDate, setStartDate] = useState('');
+  // const [endDate, setEndDate] = useState('');
 
-  // State for form inputs
-  const [date, setDate] = useState(today);
-  const [count, setCount] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const { date, setDate, count, setCount, startDate, setStartDate, endDate, setEndDate } = useApodStore();
 
-  // State for results
-  const [result, setResult1] = useState(null);
-  const [results2, setResults2] = useState([]);
-  const [results3, setResults3] = useState([]);
+
+
+  // Zustand store
+  const { result, results2, results3, fetchByDate, fetchByCount, fetchByDateRange } = useApodStore();
 
   // Fetch data for form 1 (By Date) on component mount or date change
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/nasa/apod?date=${date}`);
-        const data = await response.json();
-        setResult1(data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
+    fetchByDate(date);
+  }, [date, fetchByDate]);
 
-    fetchData();
-  }, [date]);
-
-  // Handlers for form submissions`
-  const fetchByCount = () => {
-    fetch(`/nasa/apods?count=${count}`)
-      .then(response => response.json())
-      .then(data => setResults2(data));
+  // Handlers for form submissions
+  const handleFetchByCount = () => {
+    fetchByCount(count);
   };
 
-  const fetchByDateRange = () => {
-    fetch(`/nasa/apods?start_date=${startDate}&end_date=${endDate}`)
-      .then(response => response.json())
-      .then(data => setResults3(data));
+  const handleFetchByDateRange = () => {
+    fetchByDateRange(startDate, endDate);
   };
 
   return (
@@ -101,7 +81,7 @@ const Page2 = () => {
         <Col>
           <Form.Label>Count</Form.Label>
           <Form.Control type="number" value={count} onChange={(e) => setCount(e.target.value)} />
-          <Button onClick={fetchByCount}>Fetch</Button>
+          <Button onClick={handleFetchByCount}>Fetch</Button>
         </Col>
       </Row>
       <Accordion defaultActiveKey="0">
@@ -120,7 +100,7 @@ const Page2 = () => {
         <Col>
           <Form.Label>End Date</Form.Label>
           <Form.Control type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-          <Button onClick={fetchByDateRange}>Fetch</Button>
+          <Button onClick={handleFetchByDateRange}>Fetch</Button>
         </Col>
       </Row>
       <Accordion>
