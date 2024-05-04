@@ -18,10 +18,15 @@ const Page2 = () => {
   // Zustand store
   const { result, results2, results3, fetchByDate, fetchByCount, fetchByDateRange } = useApodStore();
 
-  // Fetch data for form 1 (By Date) on component mount or date change
+  // // Fetch data for form 1 (By Date) on component mount or date change
   useEffect(() => {
+    if (result === null)
     fetchByDate(date);
-  }, [date, fetchByDate]);
+  }, []);
+
+  const handleDate = () => {
+    fetchByDate(date);
+  }
 
   // Handlers for form submissions
   const handleFetchByCount = () => {
@@ -39,6 +44,7 @@ const Page2 = () => {
         <Col>
           <Form.Label>Select Date</Form.Label>
           <Form.Control type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          <Button onClick={handleDate}>Fetch</Button>
         </Col>
       </Row>
       <Accordion defaultActiveKey="0">
